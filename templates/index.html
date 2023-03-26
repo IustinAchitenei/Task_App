@@ -1,0 +1,96 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Task Manager</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>Task Manager</h1>
+      </div>
+      <div class="add-task">
+        <h2>Add a task</h2>
+        <form action="/add_task" method="POST">
+          <input type="text" name="title" placeholder="Title">
+          <textarea name="description" placeholder="Description"></textarea>
+          <input class="flatpickr" type="text" name="due_date" placeholder="Due date">
+        <select id="goal_type" name="goal_type">
+          <option value="agenda">Agenda Entry</option>
+          <option value="short-term-goal">Short Term Goal</option>
+          <option value="long-term-goal">Long Term Goal</option>
+          <option value="meeting">Meeting</option>
+          <option value="deadline">Deadline</option>
+        </select>
+
+          <button type="submit">Add task</button>
+        </form>
+      </div>
+      <div class="tasks">
+        <h2>Tasks</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Description</th>
+              <th>Due date</th>
+              <th>Time left</th>
+              <th>Type</th>
+              <th>Done</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for task in tasks %}
+              <tr>
+                <td>{{ task.title }}</td>
+                <td>{{ task.description }}</td>
+                <td>{{ task.due_date }}</td>
+                <td>{{ task.time_left }} days</td>
+                <td>{{ task.goal_type }}</td>
+                <td><input type="checkbox" name="done" {% if task.done %}checked{% endif %}></td>
+                <td>
+                  <form action="/delete_task" method="POST">
+                    <input type="hidden" name="event_id" value="{{ task.id }}">
+                    <button type="submit">Delete</button>
+                  </form>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <script>
+      flatpickr(".flatpickr", {
+        minDate: "today",
+        dateFormat: "Y-m-d"
+      });
+
+      flatpickr("#calendar", {
+        inline: true,
+        defaultDate: "today",
+        disable: taskDates,
+        dateFormat: "Y-m-d"
+      });
+    </script>
+    <script>
+        const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+      
+        checkboxes.forEach(checkbox => {
+          checkbox.addEventListener('change', function() {
+            if(this.checked) {
+              this.parentNode.parentNode.style.backgroundColor = 'lightgreen';
+            } else {
+              this.parentNode.parentNode.style.backgroundColor = '';
+            }
+          });
+        });
+      </script>      
+  </body>
+</html>
